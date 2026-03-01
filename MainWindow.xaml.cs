@@ -53,7 +53,7 @@ namespace TorrentSizeCheckerWPF
         public MainWindow()
         {
             InitializeComponent();
-            LoadDatabaseFile();
+            checkAndLoadDatabaseFile();
         }
 
         private void ColumnsContextMenu_Opened(object sender, RoutedEventArgs e)
@@ -122,7 +122,7 @@ namespace TorrentSizeCheckerWPF
                 return;
             }
 
-            // fallback if the column was never visible
+            // fallback se non era mai stata visibile
             col.Width = 120;
         }
 
@@ -136,7 +136,7 @@ namespace TorrentSizeCheckerWPF
             };
         }
 
-        public void SetLabelInvalidDatabase()
+        public void setLableInvalidDatabase()
         {
             LabelDatabaseUpdateTime.Content = "Invalid database";
             MessageBox.Show("Invalid Database");
@@ -160,7 +160,7 @@ namespace TorrentSizeCheckerWPF
         }
 
 
-        private void LoadDatabaseFile()
+        private void checkAndLoadDatabaseFile()
         {
             List<string> databaseList;
             try
@@ -168,7 +168,7 @@ namespace TorrentSizeCheckerWPF
                 //Create file if not exists
                 if (!File.Exists(NameFileDatabase))
                 {
-                    MessageBox.Show("The database does not exist yet. It will be created at: " + NameFileDatabase);
+                    MessageBox.Show("Il database non esiste ancora. Sarà creato in: " + NameFileDatabase);
                     using (StreamWriter w = File.AppendText(NameFileDatabase))
                     {
                         w.WriteLine(); //Add an empty line for the directory path
@@ -182,20 +182,20 @@ namespace TorrentSizeCheckerWPF
 
                 if (databaseList.Count < 4)
                 {
-                    MessageBox.Show("The database is invalid. It must have at least 4 lines. Delete or verify the file at: " + NameFileDatabase);
-                    SetLabelInvalidDatabase();
+                    MessageBox.Show("Il database è invalido. Il database deve avere almeno 4 linee. Cancellare o verificare il file in: " + NameFileDatabase);
+                    setLableInvalidDatabase();
                     return;
                 }    
             }
             catch (Exception)
             {
-                MessageBox.Show("Unable to create the database. Check permissions at: " + NameFileDatabase);
-                SetLabelInvalidDatabase();
+                MessageBox.Show("Impossibile creare il database. Verificare le permissions in: " + NameFileDatabase);
+                setLableInvalidDatabase();
                 return;
             }
 
             
-            // Read the first line into TextBoxRoot and remove it from databaseList
+            //Put le first line on the TextBoxAggiornaDatabase and delete it from databaseList
             TextBoxRoot.Text = databaseList.First();
             databaseList.RemoveAt(0);
             //Put the second line (but is the first in the array now) in the LabelDatabaseUpdateTime and delete it from databaseList
@@ -207,7 +207,7 @@ namespace TorrentSizeCheckerWPF
                 }
                 catch (Exception)
                 {
-                    SetLabelInvalidDatabase();
+                    setLableInvalidDatabase();
                     return;
                 }
             }
@@ -271,7 +271,7 @@ namespace TorrentSizeCheckerWPF
             return strOut;
         }
 
-        List<FileAndSizeInBytes> GetFilesInTorrent(string s)
+        List<FileAndSizeInBytes> getfilesInTorrent(string s)
         {
             List<FileAndSizeInBytes> ret = new List<FileAndSizeInBytes>();
 
@@ -312,7 +312,7 @@ namespace TorrentSizeCheckerWPF
 
         private void ButtonUpdateDatabaseFile_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to rebuild the file database? This will take some time.", "Confirm", MessageBoxButton.YesNo);
+            MessageBoxResult result = MessageBox.Show("Sei sicuro di voler ricostruire il database dei file? Questo richiedera un po di tempo.", "Conferma", MessageBoxButton.YesNo);
             if (result == MessageBoxResult.Yes)
             {
                 try
@@ -325,10 +325,10 @@ namespace TorrentSizeCheckerWPF
                     }
                     using (StreamWriter w = File.AppendText(NameFileDatabase))
                     {
-                        w.WriteLine(TextBoxRoot.Text); // Write root directory path as first line
-                        w.WriteLine(DateTime.Now); // Write update timestamp as second line
-                        w.WriteLine(TextBoxSourceDir.Text); // Write torrent source directory as third line
-                        w.WriteLine(TextBoxDestDir.Text); // Write torrent destination directory as fourth line
+                        w.WriteLine(TextBoxRoot.Text); //Aggiungi al database come prima linea la directory root di esplorazione dei file
+                        w.WriteLine(DateTime.Now); //Aggiungi al database come seconda linea la data di aggiornamento del database
+                        w.WriteLine(TextBoxSourceDir.Text); //Aggiungi al database come terza linea la directory sorgente dei torrent 
+                        w.WriteLine(TextBoxDestDir.Text); //Aggiungi al database come quarta linea la directory di destinazione dei torrent
 
                         List<string> allfiles = ApplyAllFiles(TextBoxRoot.Text, true);
                         //MessageBox.Show("Dati dei file letti. Ci sono "+ allfiles.Count +" files. Adesso analizzo la dimensione");
@@ -347,7 +347,7 @@ namespace TorrentSizeCheckerWPF
 
                                 if (sizefile >= MinSizeFile)
                                 {
-                                    // Write file path and size to database
+                                    //Aggiungi il path del file e la dimensione al database
                                     w.WriteLine(s);
                                     w.WriteLine(sizefile);
                                     w.Flush();
@@ -361,7 +361,7 @@ namespace TorrentSizeCheckerWPF
 
                         }
                     }
-                    MessageBox.Show("Database update completed.");
+                    MessageBox.Show("Aggiornamento database completato.");
                     TextBoxRoot.Background = new SolidColorBrush(Colors.White);
                     TextBoxSourceDir.Background = new SolidColorBrush(Colors.White);
                     TextBoxDestDir.Background = new SolidColorBrush(Colors.White);
@@ -373,15 +373,15 @@ namespace TorrentSizeCheckerWPF
             }
         }
 
-        public void RefreshDuplicatesList()
+        public void reInsertDataInListDuplicates()
         {
-            // For each file in the selected torrent's match list
-            // add it to the results view
+            // per ogni file I presente nella lista del dizionario[alla chiave selezionata]
+            //   aggiungi I alla listBoxResult
             ListViewDuplicates.Items.Clear();
             if ((ListBoxTorrent.Items.Count > 0) && (ListBoxTorrent.SelectedIndex >= 0))
             {
 
-                    int numSameNameFiles = 0;
+                    int numFileStessoNome = 0;
                     var torrentPath = Path.Combine(TextBoxSourceDir.Text, (string)ListBoxTorrent.Items[ListBoxTorrent.SelectedIndex]);
 
                     List<Tuple<FileAndSizeInBytes, FileAndSizeInBytes>> listDuplicates = dicDuplicates.getListTouple(torrentPath);
@@ -399,7 +399,7 @@ namespace TorrentSizeCheckerWPF
                         });
                         if (t.Item1.FileName == t.Item2.FileName)
                         {
-                            numSameNameFiles++;
+                            numFileStessoNome++;
                         }
                     }
                     for (int i = 0; i < 1; i++) {                         
@@ -424,18 +424,18 @@ namespace TorrentSizeCheckerWPF
                         });
                     }
 
-                    LabelTotalFiles.Content = listDuplicates.Count + listUnique.Count;
-                    LabelEqualPairs.Content = listDuplicates.Count;
-                    LabelDifferentFiles.Content = listUnique.Count;
-                    LabelSameNameFiles.Content = numSameNameFiles;
+                    LabelNumeroFileTotali.Content = listDuplicates.Count + listUnique.Count;
+                    LabelNumeroFileUguali.Content = listDuplicates.Count;
+                    labelNumeroFileDiversi.Content = listUnique.Count;
+                    labelNumeroFileStessoNome.Content = numFileStessoNome;
 
             }
             else
             {
-                LabelTotalFiles.Content = "";
-                LabelEqualPairs.Content = 0;
-                LabelSameNameFiles.Content = 0;
-                LabelDifferentFiles.Content = 0;
+                LabelNumeroFileTotali.Content = "";
+                LabelNumeroFileUguali.Content = 0;
+                labelNumeroFileStessoNome.Content = 0;
+                labelNumeroFileDiversi.Content = 0;
                 ListViewDuplicates.Items.Add(new DuplicateRow
                 {
                     Size = 0,
@@ -466,15 +466,15 @@ namespace TorrentSizeCheckerWPF
                 string srcDir = TextBoxSourceDir.Text;
                 string destDir = TextBoxDestDir.Text;
 
-                // Build the dictionary of matching file lists
+                // Crea il dizionario delle liste dei file uguali
                 List<string> allFilesInDir = ApplyAllFiles(TextBoxSourceDir.Text, false);
                 List<string> torrentToMove = new List<string>(allFilesInDir);
-                //for each file in the source directory
+                //per ogni torrent S presente nella cartella
                 foreach (string fileInDirectory in allFilesInDir)
                 {
                     if (Path.GetExtension(fileInDirectory).ToLower() == ".torrent")
                     {
-                        List<FileAndSizeInBytes> filesInTorrent = GetFilesInTorrent(fileInDirectory);
+                        List<FileAndSizeInBytes> filesInTorrent = getfilesInTorrent(fileInDirectory);
                         List<FileAndSizeInBytes> filesInTorrentToKeep = new List<FileAndSizeInBytes>();
 
 
@@ -484,18 +484,18 @@ namespace TorrentSizeCheckerWPF
                         }
                         else
                         {
-                            //for each file F in the torrent
+                            //per ogni file F presente nel torrent
                             foreach (FileAndSizeInBytes fileInTorrent in filesInTorrent)
                             {
                                 Boolean addTorrentToKeep = true;
                                 filesInTorrentToKeep.Add(new FileAndSizeInBytes(fileInTorrent.FileCompleteName, fileInTorrent.SizeInBytes, fileInTorrent.FileCompleteName));
-                                //for each file G in the database
+                                //per ogni file G presente nel database
                                 foreach (FileAndSizeInBytes fileInDB in ListFileInDatabase)
                                 {
-                                    //if F.size == G.size (file match found)
+                                    //se F.dimensione = G.dimensione
                                     if (fileInTorrent.SizeInBytes == fileInDB.SizeInBytes)
                                     {
-                                        //store {F,G} match in dictionary
+                                        //memorizza {F,G} nel dizionario D
                                         dicDuplicates.AddFilesToDictionary(fileInDirectory, fileInTorrent, fileInDB);
                                         torrentToMove.Remove(fileInDirectory);
                                         addTorrentToKeep = false;
@@ -536,8 +536,8 @@ namespace TorrentSizeCheckerWPF
 
                 // Write he dictionary in the ListBoxes
 
-                // For each torrent to be checked
-                // add it to ListBoxTorrent
+                // per ogni file S presente in dizionario
+                //   aggiungi S alla listboxTorrent
                 ListBoxTorrent.Items.Clear();
                 if (torrentToBeChecked.Count > 0)
                 {
@@ -548,7 +548,7 @@ namespace TorrentSizeCheckerWPF
                     }
                 }
 
-                RefreshDuplicatesList();
+                reInsertDataInListDuplicates();
 
             }
             catch (Exception)
@@ -562,12 +562,12 @@ namespace TorrentSizeCheckerWPF
 
         private void ListBoxTorrent_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            RefreshDuplicatesList();
+            reInsertDataInListDuplicates();
         }
 
-        private void ButtonMoveAnyway_Click(object sender, RoutedEventArgs e)
+        private void ButtonSpostaComunque_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Are you sure you want to move the selected torrent anyway?", "Confirm", MessageBoxButton.YesNo);
+            MessageBoxResult result = MessageBox.Show("Sei sicuro di spostare comunque i tottent?", "Conferma", MessageBoxButton.YesNo);
 
             if (result == MessageBoxResult.Yes)
             {
@@ -595,7 +595,7 @@ namespace TorrentSizeCheckerWPF
                 }
                 else
                 {
-                    MessageBox.Show("No file selected");
+                    MessageBox.Show("Nessun file selezionato");
                 }
             }
 

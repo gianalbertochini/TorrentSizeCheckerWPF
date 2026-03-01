@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TorrentSizeCheckerWPF"
         mc:Ignorable="d"
-        Title="Torrent Size Checker" MinHeight="480" Height="480" MinWidth="640" Width="900" Loaded="Window_Loaded">
+        Title="MainWindow" MinHeight="480" Height="480" MinWidth="640" Width="900" Loaded="Window_Loaded">
         <Grid Margin="5,5,5,5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -15,21 +15,21 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Row 0: top bar with buttons + TextBoxRoot -->
+            <!-- Riga 0: barra superiore bottoni + TextBoxRoot -->
             <DockPanel Grid.Row="0" Margin="5,5,5,5" LastChildFill="True">
                 <Button DockPanel.Dock="Left" Content="Torrent Options" Width="90" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                <Button DockPanel.Dock="Left" x:Name="ButtonUpdateDatabase" Content="Update File Database" Width="167" VerticalAlignment="Center" Click="ButtonUpdateDatabaseFile_Click" Margin="0,0,5,0"/>
+                <Button DockPanel.Dock="Left" x:Name="ButtonAggiornaDatabase" Content="Aggiorna database dei file" Width="167" VerticalAlignment="Center" Click="ButtonUpdateDatabaseFile_Click" Margin="0,0,5,0"/>
                 <Button DockPanel.Dock="Right" x:Name="ButtonChangeRootPath" Content="Change root path" Width="114" VerticalAlignment="Center" Click="ButtonChangeRootPath_Click" Margin="5,0,0,0"/>
                 <TextBox x:Name="TextBoxRoot" TextWrapping="Wrap" TextChanged="TextBoxRoot_TextChanged" Height="24" VerticalAlignment="Center"/>
             </DockPanel>
 
-            <!-- Row 1: database info -->
+            <!-- Riga 1: info database -->
             <DockPanel Grid.Row="1" Margin="5,5,5,5" LastChildFill="False">
-                <Label x:Name="LabelDatabaseUpdatedAt" Content="Database updated at:" VerticalAlignment="Top"/>
-                <Label x:Name="LabelDatabaseUpdateTime" Content="No database loaded" VerticalAlignment="Top"/>
+                <Label x:Name="LabedDatabaseUpdatedTo" Content="Database aggiornato a:" VerticalAlignment="Top"/>
+                <Label x:Name="LabelDatabaseUpdateTime" Content="No Database is loaded" VerticalAlignment="Top"/>
             </DockPanel>
 
-            <!-- Row 2: ListBox + ListView - stretches with window -->
+            <!-- Riga 2: ListBox + ListView - si allunga con la finestra -->
             <DockPanel Grid.Row="2" LastChildFill="True" Margin="5,5,5,5">
                 <ListBox DockPanel.Dock="Left" x:Name="ListBoxTorrent" Width="223" d:ItemsSource="{d:SampleData ItemCount=5}" SelectionChanged="ListBoxTorrent_SelectionChanged"/>
                 <Rectangle Width="5"></Rectangle>
@@ -77,32 +77,32 @@
                 </ListView>
             </DockPanel>
 
-            <!-- Row 3: statistics -->
+            <!-- Riga 3: statistiche -->
             <DockPanel Grid.Row="3" LastChildFill="True" Margin="5,5,5,5">
-                <Button DockPanel.Dock="Left" x:Name="ButtonCheckAndMoveTorrents" Content="Check torrents and move them&#xD;&#xA;using the local database" Width="222" Click="ButtonMoveFile_Click"/>
-                <Button DockPanel.Dock="Right" x:Name="ButtonMoveAnyway" Content="Move Torrent Anyway" VerticalAlignment="Center" Click="ButtonMoveAnyway_Click" Width="180"/>
+                <Button DockPanel.Dock="Left" x:Name="ButtonSpostaITorrent" Content="Controlla i torrent e spostali&#xD;&#xA;usando il database locale" Width="222" Click="ButtonMoveFile_Click"/>
+                <Button DockPanel.Dock="Right" x:Name="ButtonSpostaComunque" Content="Sposta comunque il torrent" VerticalAlignment="Center" Click="ButtonSpostaComunque_Click" Width="180"/>
                 <DockPanel LastChildFill="False" VerticalAlignment="Center">
-                    <Label Content="Total files:"/>
-                    <Label x:Name="LabelTotalFiles" Content="0"/>
-                    <Label Content="Equal pairs:"/>
-                    <Label x:Name="LabelEqualPairs" Content="0"/>
-                    <Label Content="Different files:"/>
-                    <Label x:Name="LabelDifferentFiles" Content="0"/>
-                    <Label Content="Same name:"/>
-                    <Label x:Name="LabelSameNameFiles" Content="0"/>
+                    <Label Content="Numero file totali:"/>
+                    <Label x:Name="LabelNumeroFileTotali" Content="0"/>
+                    <Label Content="Numero coppie uguali:"/>
+                    <Label x:Name="LabelNumeroFileUguali" Content="0"/>
+                    <Label Content="Numero diversi:"/>
+                    <Label x:Name="labelNumeroFileDiversi" Content="0"/>
+                    <Label Content="Stesso nome:"/>
+                    <Label x:Name="labelNumeroFileStessoNome" Content="0"/>
                 </DockPanel>
             </DockPanel>
 
-            <!-- Row 4: source and destination directories -->
+            <!-- Riga 4: directory sorgente e destinazione -->
             <StackPanel Grid.Row="4">
                 <DockPanel LastChildFill="True" Margin="5,5,5,5">
-                    <Button DockPanel.Dock="Left" x:Name="ButtonSelectSourceDir" Content="Open Source Dir" Width="95" Click="ButtonSelectSourceDir_Click"/>
-                    <Label DockPanel.Dock="Left" Content="Source dir .torrent" Width="138" VerticalAlignment="Center"/>
+                    <Button DockPanel.Dock="Left" x:Name="ButtonSelectSourceDir" Content="Apri Source Dir" Width="95" Click="ButtonSelectSourceDir_Click"/>
+                    <Label DockPanel.Dock="Left" Content="Dir sorgente .torrent" Width="138" VerticalAlignment="Center"/>
                     <TextBox x:Name="TextBoxSourceDir" TextWrapping="Wrap" VerticalAlignment="Center" AutomationProperties.Name="TextBoxSourceDir" TextChanged="TextBoxSourceDir_TextChanged"/>
                 </DockPanel>
                 <DockPanel LastChildFill="True" Margin="5,5,5,5">
-                    <Button DockPanel.Dock="Left" x:Name="ButtonSelectDestDir" Content="Open Dest Dir" Width="95" Click="ButtonSelectDestDir_Click"/>
-                    <Label DockPanel.Dock="Left" Content="Destination dir .torrent" Width="138" VerticalAlignment="Center"/>
+                    <Button DockPanel.Dock="Left" x:Name="ButtonSelectDestDir" Content="Apri Dest Dir" Width="95" Click="ButtonSelectDestDir_Click"/>
+                    <Label DockPanel.Dock="Left" Content="Dir destinazione .torrent" Width="138" VerticalAlignment="Center"/>
                     <TextBox x:Name="TextBoxDestDir" TextWrapping="Wrap" VerticalAlignment="Center" AutomationProperties.Name="TextBoxDestDir" TextChanged="TextBoxDestDir_TextChanged"/>
                 </DockPanel>
             </StackPanel>
