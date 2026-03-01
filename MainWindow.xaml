@@ -1,0 +1,113 @@
+﻿<Window x:Name="Window" x:Class="TorrentSizeCheckerWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TorrentSizeCheckerWPF"
+        mc:Ignorable="d"
+        Title="Torrent Size Checker" MinHeight="480" Height="480" MinWidth="640" Width="900" Loaded="Window_Loaded">
+        <Grid Margin="5,5,5,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Row 0: top bar with buttons + TextBoxRoot -->
+            <DockPanel Grid.Row="0" Margin="5,5,5,5" LastChildFill="True">
+                <Button DockPanel.Dock="Left" Content="Torrent Options" Width="90" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <Button DockPanel.Dock="Left" x:Name="ButtonUpdateDatabase" Content="Update File Database" Width="167" VerticalAlignment="Center" Click="ButtonUpdateDatabaseFile_Click" Margin="0,0,5,0"/>
+                <Button DockPanel.Dock="Right" x:Name="ButtonChangeRootPath" Content="Change root path" Width="114" VerticalAlignment="Center" Click="ButtonChangeRootPath_Click" Margin="5,0,0,0"/>
+                <TextBox x:Name="TextBoxRoot" TextWrapping="Wrap" TextChanged="TextBoxRoot_TextChanged" Height="24" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <!-- Row 1: database info -->
+            <DockPanel Grid.Row="1" Margin="5,5,5,5" LastChildFill="False">
+                <Label x:Name="LabelDatabaseUpdatedAt" Content="Database updated at:" VerticalAlignment="Top"/>
+                <Label x:Name="LabelDatabaseUpdateTime" Content="No database loaded" VerticalAlignment="Top"/>
+            </DockPanel>
+
+            <!-- Row 2: ListBox + ListView - stretches with window -->
+            <DockPanel Grid.Row="2" LastChildFill="True" Margin="5,5,5,5">
+                <ListBox DockPanel.Dock="Left" x:Name="ListBoxTorrent" Width="223" d:ItemsSource="{d:SampleData ItemCount=5}" SelectionChanged="ListBoxTorrent_SelectionChanged"/>
+                <Rectangle Width="5"></Rectangle>
+                <ListView x:Name="ListViewDuplicates"
+                          SelectionMode="Extended"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListView.Resources>
+                        <ContextMenu x:Key="ColumnsContextMenu" Opened="ColumnsContextMenu_Opened" />
+                    </ListView.Resources>
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="True">
+                            <GridViewColumn Width="120" DisplayMemberBinding="{Binding Size}">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader x:Name="HeaderSize" Content="Size" ContextMenu="{StaticResource ColumnsContextMenu}" />
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                            <GridViewColumn Width="70">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader x:Name="HeaderSizeHR" Content="SizeHR" ContextMenu="{StaticResource ColumnsContextMenu}" />
+                                </GridViewColumn.Header>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding SizeHR}" TextAlignment="Right" HorizontalAlignment="Right" Width="100" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="450" DisplayMemberBinding="{Binding TorrentFile}">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader x:Name="HeaderTorrentFile" Content="Torrent file" ContextMenu="{StaticResource ColumnsContextMenu}" />
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                            <GridViewColumn Width="450" DisplayMemberBinding="{Binding FileDBFile}">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader x:Name="HeaderFileDbFile" Content="DB file" ContextMenu="{StaticResource ColumnsContextMenu}" />
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                            <GridViewColumn Width="700" DisplayMemberBinding="{Binding FileDBFullPath}">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader x:Name="HeaderFileDbFullPath" Content="DB full path" ContextMenu="{StaticResource ColumnsContextMenu}" />
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DockPanel>
+
+            <!-- Row 3: statistics -->
+            <DockPanel Grid.Row="3" LastChildFill="True" Margin="5,5,5,5">
+                <Button DockPanel.Dock="Left" x:Name="ButtonCheckAndMoveTorrents" Content="Check torrents and move them&#xD;&#xA;using the local database" Width="222" Click="ButtonMoveFile_Click"/>
+                <Button DockPanel.Dock="Right" x:Name="ButtonMoveAnyway" Content="Move Torrent Anyway" VerticalAlignment="Center" Click="ButtonMoveAnyway_Click" Width="180"/>
+                <DockPanel LastChildFill="False" VerticalAlignment="Center">
+                    <Label Content="Total files:"/>
+                    <Label x:Name="LabelTotalFiles" Content="0"/>
+                    <Label Content="Equal pairs:"/>
+                    <Label x:Name="LabelEqualPairs" Content="0"/>
+                    <Label Content="Different files:"/>
+                    <Label x:Name="LabelDifferentFiles" Content="0"/>
+                    <Label Content="Same name:"/>
+                    <Label x:Name="LabelSameNameFiles" Content="0"/>
+                </DockPanel>
+            </DockPanel>
+
+            <!-- Row 4: source and destination directories -->
+            <StackPanel Grid.Row="4">
+                <DockPanel LastChildFill="True" Margin="5,5,5,5">
+                    <Button DockPanel.Dock="Left" x:Name="ButtonSelectSourceDir" Content="Open Source Dir" Width="95" Click="ButtonSelectSourceDir_Click"/>
+                    <Label DockPanel.Dock="Left" Content="Source dir .torrent" Width="138" VerticalAlignment="Center"/>
+                    <TextBox x:Name="TextBoxSourceDir" TextWrapping="Wrap" VerticalAlignment="Center" AutomationProperties.Name="TextBoxSourceDir" TextChanged="TextBoxSourceDir_TextChanged"/>
+                </DockPanel>
+                <DockPanel LastChildFill="True" Margin="5,5,5,5">
+                    <Button DockPanel.Dock="Left" x:Name="ButtonSelectDestDir" Content="Open Dest Dir" Width="95" Click="ButtonSelectDestDir_Click"/>
+                    <Label DockPanel.Dock="Left" Content="Destination dir .torrent" Width="138" VerticalAlignment="Center"/>
+                    <TextBox x:Name="TextBoxDestDir" TextWrapping="Wrap" VerticalAlignment="Center" AutomationProperties.Name="TextBoxDestDir" TextChanged="TextBoxDestDir_TextChanged"/>
+                </DockPanel>
+            </StackPanel>
+
+        </Grid>
+
+
+</Window>
